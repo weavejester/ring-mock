@@ -1,10 +1,17 @@
 (ns ring.mock.request
   "Functions to create mock request maps."
   (:require [clojure.string :as string])
-  (:use [hiccup.page-helpers :only (encode-params)])
   (:import java.util.Map
            java.io.ByteArrayInputStream
            [java.net URI URLEncoder]))
+
+(defn encode-params
+  "Turn a map of parameters into a urlencoded string."
+  [params]
+  (string/join "&"
+    (for [[k v] params]
+      (str (URLEncoder/encode (name k)) "="
+           (URLEncoder/encode (str v))))))
 
 (defn- query-string
   "Create a query string from a URI and a map of parameters."
