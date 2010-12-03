@@ -5,7 +5,7 @@
            java.io.ByteArrayInputStream
            [java.net URI URLEncoder]))
 
-(defn encode-params
+(defn- encode-params
   "Turn a map of parameters into a urlencoded string."
   [params]
   (string/join "&"
@@ -44,9 +44,17 @@
         :headers        {}})))
 
 (defn header
-  "Add a HTTP header to a request map."
-  [request name value]
-  (assoc-in request [:headers name] value))
+  "Add a HTTP header to the request map."
+  [request header value]
+  (let [header (string/lower-case (name header))]
+    (assoc-in request [:headers header] (str value))))
+
+(defn content-type
+  "Set the content type of the request map."
+  [request mime-type]
+  (-> request
+      (assoc :content-type mime-type)
+      (header :content-type mime-type)))
 
 (defprotocol Streamable
   (to-stream [x] "Turn x into an InputStream"))

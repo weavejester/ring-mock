@@ -39,7 +39,14 @@
 
 (deftest test-header
   (is (= (header {} "X-Foo" "Bar")
-         {:headers {"X-Foo" "Bar"}})))
+         {:headers {"x-foo" "Bar"}}))
+  (is (= (header {} :x-foo "Bar")
+         {:headers {"x-foo" "Bar"}})))
+
+(deftest test-content-type
+  (is (= (content-type {} "text/html")
+         {:content-type "text/html"
+          :headers {"content-type" "text/html"}})))
 
 (defn- slurp* [stream]
   (let [writer (StringWriter.)]
