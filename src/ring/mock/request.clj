@@ -16,8 +16,10 @@
                 [query (encode-params params)])))))
 
 (defn request
-  "Create a minimal valid request map from a HTTP method keyword and
-  a URI string. The URI can be relative or absolute."
+  "Create a minimal valid request map from a HTTP method keyword, a string
+  containing a URI, and an optional map of parameters that will be added to
+  the query string of the URI. The URI can be relative or absolute. Relative
+  URIs are assumed to go to http://localhost."
   ([method uri]
      (request method uri nil))
   ([method uri params]
@@ -35,7 +37,7 @@
         :headers        {}})))
 
 (defn header
-  "Add a header to a request."
+  "Add a HTTP header to a request map."
   [request name value]
   (assoc-in request [:headers name] value))
 
