@@ -1,4 +1,4 @@
 (defproject ring-mock "0.1.0"
-  :description "FIXME: write"
+  :description "Library for creating mock Ring request maps"
   :dependencies [[org.clojure/clojure "1.2.0"]
                  [ring/ring-core "0.3.5"]])
