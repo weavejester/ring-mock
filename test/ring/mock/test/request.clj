@@ -48,6 +48,11 @@
          {:content-type "text/html"
           :headers {"content-type" "text/html"}})))
 
+(deftest test-content-length
+  (is (= (content-length {} 10)
+         {:content-length 10
+          :headers {"content-length" "10"}})))
+
 (defn- slurp* [stream]
   (let [writer (StringWriter.)]
     (io/copy stream writer)
@@ -55,10 +60,14 @@
 
 (deftest test-body
   (testing "string body"
-    (let [body (:body (body {} "Hello World"))]
-      (is (instance? InputStream body))
-      (is (= (slurp* body) "Hello World"))))
+    (let [resp (body {} "Hello World")]
+      (is (instance? InputStream (:body resp)))
+      (is (= (slurp* (:body resp)) "Hello World"))
+      (is (= (:content-length resp) 11))))
   (testing "map body"
-    (let [body (:body (body {} {:foo "bar"}))]
-      (is (instance? InputStream body))
-      (is (= (slurp* body) "foo=bar")))))
+    (let [resp (body {} {:foo "bar"})]
+      (is (instance? InputStream (:body resp)))
+      (is (= (slurp* (:body resp)) "foo=bar"))
+      (is (= (:content-length resp) 7))
+      (is (= (:content-type resp)
+             "application/x-www-form-urlencoded")))))

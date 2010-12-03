@@ -56,19 +56,25 @@
       (assoc :content-type mime-type)
       (header :content-type mime-type)))
 
-(defprotocol Streamable
-  (to-stream [x] "Turn x into an InputStream"))
+(defn content-length
+  "Set the content length of the request map."
+  [request length]
+  (-> request
+      (assoc :content-length length)
+      (header :content-length length)))
 
-(extend-protocol Streamable
-  String
-  (to-stream [s]
-    (ByteArrayInputStream. (.getBytes s)))
-  Map
-  (to-stream [m]
-    (to-stream (encode-params m))))
-
-(defn body
+(defmulti body
   "Set the body of the request. The supplied body value can be a string or
   a map of parameters to be url-encoded."
-  [request body]
-  (assoc request :body (to-stream body)))
+  (fn [request x] (type x)))
+
+(defmethod body String [request string]
+  (let [bytes (.getBytes string)]
+    (-> request
+        (content-length (count bytes))
+        (assoc :body (ByteArrayInputStream. bytes)))))
+
+(defmethod body Map [request params]
+  (-> request
+      (content-type "application/x-www-form-urlencoded")
+      (body (encode-params params))))
