@@ -1,17 +1,21 @@
-# ring-mock
+# Ring-Mock
 
-FIXME: write description
+Ring-Mock is a library for creating [Ring][1] request maps for testing
+purposes.
 
-## Usage
+[1]: https://github.com/mmcgrana/ring
 
-FIXME: write
+## Example
+
+    (use 'ring.mock.request)
+    
+    (your-handler (request :get "/doc/10"))
+
+    (your-handler (-> (request :post "/doc")
+                      (body {:title "foo"})))
 
 ## Installation
 
-FIXME: write
+Add the following to your Leiningen dependencies:
 
-## License
-
-Copyright (C) 2010 FIXME
-
-Distributed under the Eclipse Public License, the same as Clojure.
+    [ring-mock "0.1.0"]
