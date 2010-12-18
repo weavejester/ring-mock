@@ -26,4 +26,4 @@ purposes.
 
 Add the following to your Leiningen dependencies:
 
-    [ring-mock "0.1.0"]
+    [ring-mock "0.1.1"]
