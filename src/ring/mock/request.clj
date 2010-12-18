@@ -31,17 +31,20 @@
      (request method uri nil))
   ([method uri params]
      (let [uri    (URI. uri)
-           port   (.getPort uri)
+           host   (or (.getHost uri) "localhost")
+           port   (if (not= (.getPort uri) -1) (.getPort uri))
            scheme (.getScheme uri)
            path   (.getRawPath uri)]
-       {:server-port    (if (= port -1) 80 port)
-        :server-name    (or (.getHost uri) "localhost")
+       {:server-port    (or port 80)
+        :server-name    host
         :remote-addr    "localhost"
         :uri            (if (string/blank? path) "/" path)
         :query-string   (query-string uri params)
         :scheme         (or (keyword scheme) :http)
         :request-method method
-        :headers        {}})))
+        :headers        {"host" (if port
+                                  (str host ":" port)
+                                  host)}})))
 
 (defn header
   "Add a HTTP header to the request map."

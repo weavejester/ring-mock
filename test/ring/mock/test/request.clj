@@ -14,7 +14,7 @@
             :query-string nil
             :scheme :http
             :request-method :get
-            :headers {}})))
+            :headers {"host" "localhost"}})))
   (testing "absolute uri"
     (is (= (request :post "https://example.com:8443/foo?bar=baz")
            {:server-port 8443
@@ -24,7 +24,7 @@
             :query-string "bar=baz"
             :scheme :https
             :request-method :post
-            :headers {}})))
+            :headers {"host" "example.com:8443"}})))
   (testing "nil path"
     (is (= (:uri (request :get "http://example.com")) "/")))
   (testing "added params"
