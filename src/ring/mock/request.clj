@@ -72,10 +72,12 @@
   (fn [request x] (type x)))
 
 (defmethod body String [request string]
-  (let [bytes (.getBytes string)]
-    (-> request
-        (content-length (count bytes))
-        (assoc :body (ByteArrayInputStream. bytes)))))
+  (body request (.getBytes string)))
+
+(defmethod body (class (byte-array 0)) [request bytes]
+  (-> request
+      (content-length (count bytes))
+      (assoc :body (ByteArrayInputStream. bytes))))
 
 (defmethod body Map [request params]
   (-> request
