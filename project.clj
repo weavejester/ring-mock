@@ -1,4 +1,4 @@
-(defproject ring-mock "0.1.1"
+(defproject ring-mock "0.1.2-SNAPSHOT"
   :description "A library for creating mock Ring request maps"
   :dependencies [[org.clojure/clojure "1.2.0"]]
   :dev-dependencies
