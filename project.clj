@@ -1,10 +1,6 @@
-(defproject ring-mock "0.1.1"
+(defproject malcolmsparks/ring-mock "0.2.0"
   :description "A library for creating mock Ring request maps"
-  :dependencies [[org.clojure/clojure "1.2.0"]]
-  :dev-dependencies
-    [[org.clojure/clojure-contrib "1.2.0"]
-     [autodoc "0.7.1" :exclusions [org.clojure/clojure
-                                   org.clojure/clojure-contrib]]]
+  :dependencies [[org.clojure/clojure "1.3.0"]]
   :autodoc
     {:name "Ring-Mock"
      :description "A library for creating mock Ring request maps"
