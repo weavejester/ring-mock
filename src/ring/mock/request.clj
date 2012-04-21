@@ -69,6 +69,7 @@
 (defmulti body
   "Set the body of the request. The supplied body value can be a string or
   a map of parameters to be url-encoded."
+  {:arglists '([request body-value])}
   (fn [request x] (type x)))
 
 (defmethod body String [request string]
