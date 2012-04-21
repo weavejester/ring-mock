@@ -62,12 +62,17 @@
   (testing "string body"
     (let [resp (body {} "Hello World")]
       (is (instance? InputStream (:body resp)))
-      (is (= (slurp* (:body resp)) "Hello World"))
+      (is (= (slurp (:body resp)) "Hello World"))
       (is (= (:content-length resp) 11))))
   (testing "map body"
     (let [resp (body {} {:foo "bar"})]
       (is (instance? InputStream (:body resp)))
-      (is (= (slurp* (:body resp)) "foo=bar"))
+      (is (= (slurp (:body resp)) "foo=bar"))
       (is (= (:content-length resp) 7))
       (is (= (:content-type resp)
-             "application/x-www-form-urlencoded")))))
+             "application/x-www-form-urlencoded"))))
+  (testing "bytes body"
+    (let [resp (body {} (.getBytes "foo"))]
+      (is (instance? InputStream (:body resp)))
+      (is (= (slurp (:body resp)) "foo"))
+      (is (= (:content-length resp) 3)))))
