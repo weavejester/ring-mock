@@ -16,15 +16,23 @@
             :request-method :get
             :headers {"host" "localhost"}})))
   (testing "absolute uri"
-    (is (= (request :post "https://example.com:8443/foo?bar=baz")
-           {:server-port 8443
-            :server-name "example.com"
-            :remote-addr "localhost"
-            :uri "/foo"
-            :query-string "bar=baz"
-            :scheme :https
-            :request-method :post
-            :headers {"host" "example.com:8443"}})))
+    (let [request (request :post "https://example.com:8443/foo?bar=baz" {"quux" "zot"})
+          literal-request (dissoc request :body)
+          body (:body request)]
+      (is (= literal-request
+             {:server-port 8443
+              :server-name "example.com"
+              :remote-addr "localhost"
+              :uri "/foo"
+              :query-string "bar=baz"
+              :scheme :https
+              :request-method :post
+              :content-type "application/x-www-form-urlencoded"
+              :content-length 8
+              :headers {"host" "example.com:8443"
+                        "content-type" "application/x-www-form-urlencoded"
+                        "content-length" "8"}}))
+      (is (= (slurp body) "quux=zot"))))
   (testing "nil path"
     (is (= (:uri (request :get "http://example.com")) "/")))
   (testing "added params"
