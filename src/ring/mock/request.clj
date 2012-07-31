@@ -13,14 +13,14 @@
                  (str (URLEncoder/encode (name k)) "="
                       (URLEncoder/encode (str v))))))
 
-(defn- query-string
-  "Create a query string from a URI and a map of parameters."
-  [uri params]
-  (let [query (.getRawQuery uri)]
-    (if (or query params)
-      (string/join "&"
-                   (remove string/blank?
-                           [query (encode-params params)])))))
+(defn- append-query
+  "Encode and append a map of parameters to a url query string."
+  [query params]
+  (if (or query params)
+    (string/join "&"
+                 (remove string/blank?
+                         [query (encode-params params)]))))
+
 (defn header
   "Add a HTTP header to the request map."
   [request header value]
@@ -40,6 +40,11 @@
   (-> request
       (assoc :content-length length)
       (header :content-length length)))
+
+(defn query-string
+  "Add a map of parameters to the query string of the request."
+  [request params]
+  (update-in request [:query-string] #(append-query % params)))
 
 (defprotocol BodyEncodable
   "Types which can attach themselves to a request as a body"
@@ -77,17 +82,20 @@
            port   (if (not= (.getPort uri) -1) (.getPort uri))
            scheme (.getScheme uri)
            path   (.getRawPath uri)
-           base-map {:server-port (or port 80)
-                     :server-name host
-                     :remote-addr "localhost"
-                     :uri (if (string/blank? path) "/" path)
-                     :scheme (or (keyword scheme) :http)
-                     :request-method method
-                     :headers {"host" (if port
-                                        (str host ":" port)
-                                        host)}}]
-       (case method
-         :get (assoc base-map :query-string (query-string uri params))
-         :post (-> base-map
-                   (assoc :query-string (query-string uri nil))
-                   (body params))))))
+           query  (.getRawQuery uri)
+           req    {:server-port    (or port 80)
+                   :server-name    host
+                   :remote-addr    "localhost"
+                   :uri            (if (string/blank? path) "/" path)
+                   :query-string   query
+                   :scheme         (or (keyword scheme) :http)
+                   :request-method method
+                   :headers        {"host" (if port
+                                             (str host ":" port)
+                                             host)}}]
+       (if params
+         (case method
+           :get  (query-string req params)
+           :post (body req params)
+           req)
+         req))))

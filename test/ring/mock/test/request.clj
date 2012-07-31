@@ -35,7 +35,7 @@
       (is (= (slurp body) "quux=zot"))))
   (testing "nil path"
     (is (= (:uri (request :get "http://example.com")) "/")))
-  (testing "added params"
+  (testing "added params in :get"
     (is (= (:query-string (request :get "/" {:x "y" :z "n"}))
            "x=y&z=n"))
     (is (= (:query-string (request :get "/?a=b" {:x "y"}))
@@ -43,7 +43,30 @@
     (is (= (:query-string (request :get "/?" {:x "y"}))
            "x=y"))
     (is (= (:query-string (request :get "/" {:x "a b"}))
-           "x=a+b"))))
+           "x=a+b")))
+  (testing "added params in :post"
+    (let [req (request :post "/" {:x "y" :z "n"})]
+      (is (= (slurp (:body req))
+             "x=y&z=n"))
+      (is (nil? (:query-string req))))
+    (let [req (request :post "/?a=b" {:x "y"})]
+      (is (= (slurp (:body req))
+             "x=y"))
+      (is (= (:query-string req)
+             "a=b")))
+    (let [req (request :post "/?" {:x "y"})]
+      (is (= (slurp (:body req))
+             "x=y"))
+      (is (= (:query-string req)
+             "")))
+    (let [req (request :post "/" {:x "a b"})]
+      (is (= (slurp (:body req))
+             "x=a+b"))
+      (is (nil? (:query-string req))))
+    (let [req (request :post "/?a=b")]
+      (is (nil? (:body req)))
+      (is (= (:query-string req)
+             "a=b")))))
 
 (deftest test-header
   (is (= (header {} "X-Foo" "Bar")
