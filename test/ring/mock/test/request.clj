@@ -84,6 +84,13 @@
          {:content-length 10
           :headers {"content-length" "10"}})))
 
+(deftest test-query-string
+  (is (= (-> {}
+             (query-string {:a "b"})
+             (query-string {:c "d"})
+             :query-string)
+         "c=d")))
+
 (defn- slurp* [stream]
   (let [writer (StringWriter.)]
     (io/copy stream writer)

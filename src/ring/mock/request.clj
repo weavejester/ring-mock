@@ -44,7 +44,7 @@
 (defn query-string
   "Add a map of parameters to the query string of the request."
   [request params]
-  (update-in request [:query-string] #(append-query % params)))
+  (assoc request :query-string (encode-params params)))
 
 (defprotocol BodyEncodable
   "Types which can attach themselves to a request as a body"
@@ -95,7 +95,7 @@
                                              host)}}]
        (if params
          (case method
-           :get  (query-string req params)
+           :get  (assoc req :query-string (append-query query params))
            :post (body req params)
            req)
          req))))
