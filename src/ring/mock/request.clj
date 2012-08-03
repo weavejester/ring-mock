@@ -13,7 +13,7 @@
       (str (URLEncoder/encode (name k)) "="
            (URLEncoder/encode (str v))))))
 
-(defn- query-string
+(defn- append-query
   "Create a query string from a URI and a map of parameters."
   [uri params]
   (let [query (.getRawQuery uri)]
@@ -41,6 +41,11 @@
   (-> request
       (assoc :content-length length)
       (header :content-length length)))
+
+(defn query-string
+  "Add a map of parameters to the query string of the request."
+  [request params]
+  (assoc request :query-string (encode-params params)))
 
 (defmulti body
   "Set the body of the request. The supplied body value can be a string or
