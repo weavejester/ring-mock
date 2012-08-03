@@ -78,14 +78,21 @@
            host   (or (.getHost uri) "localhost")
            port   (if (not= (.getPort uri) -1) (.getPort uri))
            scheme (.getScheme uri)
-           path   (.getRawPath uri)]
-       {:server-port    (or port 80)
-        :server-name    host
-        :remote-addr    "localhost"
-        :uri            (if (string/blank? path) "/" path)
-        :query-string   (query-string uri params)
-        :scheme         (or (keyword scheme) :http)
-        :request-method method
-        :headers        {"host" (if port
-                                  (str host ":" port)
-                                  host)}})))
+           path   (.getRawPath uri)
+           query  (.getRawQuery uri)
+           req    {:server-port    (or port 80)
+                   :server-name    host
+                   :remote-addr    "localhost"
+                   :uri            (if (string/blank? path) "/" path)
+                   :query-string   query
+                   :scheme         (or (keyword scheme) :http)
+                   :request-method method
+                   :headers        {"host" (if port
+                                             (str host ":" port)
+                                             host)}}]
+       (if params
+         (case method
+           :get  (assoc req :query-string (append-query uri params))
+           :post (body req params)
+           req)
+         req))))
