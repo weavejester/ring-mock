@@ -16,18 +16,26 @@
             :request-method :get
             :headers {"host" "localhost"}})))
   (testing "absolute uri"
-    (is (= (request :post "https://example.com:8443/foo?bar=baz")
-           {:server-port 8443
-            :server-name "example.com"
-            :remote-addr "localhost"
-            :uri "/foo"
-            :query-string "bar=baz"
-            :scheme :https
-            :request-method :post
-            :headers {"host" "example.com:8443"}})))
+    (let [request (request :post "https://example.com:8443/foo?bar=baz" {"quux" "zot"})
+          literal-request (dissoc request :body)
+          body (:body request)]
+      (is (= literal-request
+             {:server-port 8443
+              :server-name "example.com"
+              :remote-addr "localhost"
+              :uri "/foo"
+              :query-string "bar=baz"
+              :scheme :https
+              :request-method :post
+              :content-type "application/x-www-form-urlencoded"
+              :content-length 8
+              :headers {"host" "example.com:8443"
+                        "content-type" "application/x-www-form-urlencoded"
+                        "content-length" "8"}}))
+      (is (= (slurp body) "quux=zot"))))
   (testing "nil path"
     (is (= (:uri (request :get "http://example.com")) "/")))
-  (testing "added params"
+  (testing "added params in :get"
     (is (= (:query-string (request :get "/" {:x "y" :z "n"}))
            "x=y&z=n"))
     (is (= (:query-string (request :get "/?a=b" {:x "y"}))
@@ -35,7 +43,33 @@
     (is (= (:query-string (request :get "/?" {:x "y"}))
            "x=y"))
     (is (= (:query-string (request :get "/" {:x "a b"}))
-           "x=a+b"))))
+           "x=a+b")))
+  (testing "added params in :post"
+    (let [req (request :post "/" {:x "y" :z "n"})]
+      (is (= (slurp (:body req))
+             "x=y&z=n"))
+      (is (nil? (:query-string req))))
+    (let [req (request :post "/?a=b" {:x "y"})]
+      (is (= (slurp (:body req))
+             "x=y"))
+      (is (= (:query-string req)
+             "a=b")))
+    (let [req (request :post "/?" {:x "y"})]
+      (is (= (slurp (:body req))
+             "x=y"))
+      (is (= (:query-string req)
+             "")))
+    (let [req (request :post "/" {:x "a b"})]
+      (is (= (slurp (:body req))
+             "x=a+b"))
+      (is (nil? (:query-string req))))
+    (let [req (request :post "/?a=b")]
+      (is (nil? (:body req)))
+      (is (= (:query-string req)
+             "a=b"))))
+  (testing "added params in :put"
+    (let [req (request :put "/" {:x "y" :z "n"})]
+      (is (= (slurp (:body req)) "x=y&z=n")))))
 
 (deftest test-header
   (is (= (header {} "X-Foo" "Bar")
@@ -52,6 +86,19 @@
   (is (= (content-length {} 10)
          {:content-length 10
           :headers {"content-length" "10"}})))
+
+(deftest test-query-string
+  (testing "string"
+    (is (= (query-string {} "a=b")
+           {:query-string "a=b"})))
+  (testing "map of params"
+    (is (= (query-string {} {:a "b"})
+           {:query-string "a=b"})))
+  (testing "overwriting"
+    (is (= (-> {}
+               (query-string {:a "b"})
+               (query-string {:c "d"}))
+           {:query-string "c=d"}))))
 
 (defn- slurp* [stream]
   (let [writer (StringWriter.)]
