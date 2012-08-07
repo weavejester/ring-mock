@@ -66,7 +66,10 @@
     (let [req (request :post "/?a=b")]
       (is (nil? (:body req)))
       (is (= (:query-string req)
-             "a=b")))))
+             "a=b"))))
+  (testing "added params in :put"
+    (let [req (request :put "/" {:x "y" :z "n"})]
+      (is (= (slurp (:body req)) "x=y&z=n")))))
 
 (deftest test-header
   (is (= (header {} "X-Foo" "Bar")
@@ -85,11 +88,17 @@
           :headers {"content-length" "10"}})))
 
 (deftest test-query-string
-  (is (= (-> {}
-             (query-string {:a "b"})
-             (query-string {:c "d"})
-             :query-string)
-         "c=d")))
+  (testing "string"
+    (is (= (query-string {} "a=b")
+           {:query-string "a=b"})))
+  (testing "map of params"
+    (is (= (query-string {} {:a "b"})
+           {:query-string "a=b"})))
+  (testing "overwriting"
+    (is (= (-> {}
+               (query-string {:a "b"})
+               (query-string {:c "d"}))
+           {:query-string "c=d"}))))
 
 (defn- slurp* [stream]
   (let [writer (StringWriter.)]
