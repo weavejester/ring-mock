@@ -2,7 +2,7 @@
   :description "A library for creating mock Ring request maps"
   :dependencies [[org.clojure/clojure "1.5.0"]]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.1"]]}}
-  :plugins [[codox "0.6.1"]
+  :plugins [; [codox "0.6.1"]
             [lein-cljsbuild "0.3.0"]]
   :hooks [leiningen.cljsbuild]
   :cljsbuild {:builds
@@ -17,6 +17,5 @@
                {:compiler {:output-to "target/ring-mock.js"
                            :optimizations :advanced
                            :pretty-print false}
-                :source-paths ["src"]
-                :jar true}]
+                :source-paths ["src"]}]
               :test-commands {"unit-tests" ["runners/phantomjs.js" "target/ring-mock-test.js"]}})
