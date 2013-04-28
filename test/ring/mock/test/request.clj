@@ -43,7 +43,11 @@
     (is (= (:query-string (request :get "/?" {:x "y"}))
            "x=y"))
     (is (= (:query-string (request :get "/" {:x "a b"}))
-           "x=a+b")))
+           "x=a+b"))
+    (is (= (:query-string (request :get "/" {:x ["a" "b"]}))
+           "x%5B%5D=a&x%5B%5D=b"))
+    (is (= (:query-string (request :get "/" {:x '("a" "b")}))
+           "x%5B%5D=a&x%5B%5D=b")))
   (testing "added params in :post"
     (let [req (request :post "/" {:x "y" :z "n"})]
       (is (= (slurp (:body req))
@@ -66,7 +70,10 @@
     (let [req (request :post "/?a=b")]
       (is (nil? (:body req)))
       (is (= (:query-string req)
-             "a=b"))))
+             "a=b")))
+    (let [req (request :post "/" {:x ["a" "b"]})]
+      (is (= (slurp (:body req))
+             "x%5B%5D=a&x%5B%5D=b"))))
   (testing "added params in :put"
     (let [req (request :put "/" {:x "y" :z "n"})]
       (is (= (slurp (:body req)) "x=y&z=n")))))
@@ -94,6 +101,9 @@
   (testing "map of params"
     (is (= (query-string {} {:a "b"})
            {:query-string "a=b"})))
+  (testing "map of params with array value"
+    (is (= (query-string {} {:a "b" :c ["d" "e"]})
+           {:query-string "a=b&c%5B%5D=d&c%5B%5D=e"})))
   (testing "overwriting"
     (is (= (-> {}
                (query-string {:a "b"})
@@ -116,6 +126,13 @@
       (is (instance? InputStream (:body resp)))
       (is (= (slurp (:body resp)) "foo=bar"))
       (is (= (:content-length resp) 7))
+      (is (= (:content-type resp)
+             "application/x-www-form-urlencoded"))))
+  (testing "map body with array value"
+    (let [resp (body {} {:foo "bar" :bar ["baz0" "baz1"]})]
+      (is (instance? InputStream (:body resp)))
+      (is (= (slurp (:body resp)) "foo=bar&bar%5B%5D=baz0&bar%5B%5D=baz1"))
+      (is (= (:content-length resp) 37))
       (is (= (:content-type resp)
              "application/x-www-form-urlencoded"))))
   (testing "bytes body"
