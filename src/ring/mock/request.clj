@@ -8,10 +8,13 @@
 (defn- encode-params
   "Turn a map of parameters into a urlencoded string."
   [params]
-  (string/join "&"
-    (for [[k v] params]
-      (str (URLEncoder/encode (name k)) "="
-           (URLEncoder/encode (str v))))))
+  (letfn [(encode-pair [[k v]]
+            (cond
+             (map? v) (map #(encode-pair [(str (name k) "[" (name (first %)) "]") (last %)]) v)
+             (or (list? v) (vector? v) (seq? v)) (map #(encode-pair [(str (name k) "[]") %]) v)
+             :else (str (URLEncoder/encode (name k)) "="
+                        (URLEncoder/encode (str v)))))]
+    (string/join "&" (flatten (map encode-pair params)))))
 
 (defn header
   "Add a HTTP header to the request map."
