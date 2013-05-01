@@ -77,7 +77,11 @@
              "a=b")))
     (let [req (request :post "/" {:x ["a" "b"]})]
       (is (= (slurp (:body req))
-             "x%5B%5D=a&x%5B%5D=b"))))
+             (format "%s=a&%s=b" (URLEncoder/encode "x[]") (URLEncoder/encode "x[]")))))
+    (let [req (request :post "/" {:x {:y {:z 1}
+                                      :a {:b 2}}})]
+      (is (= (slurp (:body req))
+             (format "%s=1&%s=2" (URLEncoder/encode "x[y][z]") (URLEncoder/encode "x[a][b]"))))))
   (testing "added params in :put"
     (let [req (request :put "/" {:x "y" :z "n"})]
       (is (= (slurp (:body req)) "x=y&z=n")))))
