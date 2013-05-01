@@ -9,10 +9,11 @@
   "Turn a map of parameters into a urlencoded string."
   [params]
   (letfn [(encode-pair [[k v]]
-            (if (or (list? v) (vector? v) (seq? v))
-              (map #(encode-pair [(str (name k) "[]") %]) v)
-              (str (URLEncoder/encode (name k)) "="
-                   (URLEncoder/encode (str v)))))]
+            (cond
+             (map? v) (map #(encode-pair [(str (name k) "[" (name (first %)) "]") (last %)]) v)
+             (or (list? v) (vector? v) (seq? v)) (map #(encode-pair [(str (name k) "[]") %]) v)
+             :else (str (URLEncoder/encode (name k)) "="
+                        (URLEncoder/encode (str v)))))]
     (string/join "&" (flatten (map encode-pair params)))))
 
 (defn header

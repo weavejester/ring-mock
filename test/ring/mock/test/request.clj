@@ -2,7 +2,8 @@
   (:use clojure.test
         ring.mock.request)
   (:require [clojure.java.io :as io])
-  (:import [java.io InputStream StringWriter]))
+  (:import [java.io InputStream StringWriter]
+           [java.net URLEncoder]))
 
 (deftest test-request
   (testing "relative uri"
@@ -45,9 +46,12 @@
     (is (= (:query-string (request :get "/" {:x "a b"}))
            "x=a+b"))
     (is (= (:query-string (request :get "/" {:x ["a" "b"]}))
-           "x%5B%5D=a&x%5B%5D=b"))
+           (format "%s=a&%s=b" (URLEncoder/encode "x[]") (URLEncoder/encode "x[]"))))
     (is (= (:query-string (request :get "/" {:x '("a" "b")}))
-           "x%5B%5D=a&x%5B%5D=b")))
+           (format "%s=a&%s=b" (URLEncoder/encode "x[]") (URLEncoder/encode "x[]"))))
+    (is (= (:query-string (request :get "/" {:x {:y {:z 1}
+                                                 :a {:b 2}}}))
+           (format "%s=1&%s=2" (URLEncoder/encode "x[y][z]") (URLEncoder/encode "x[a][b]")))))
   (testing "added params in :post"
     (let [req (request :post "/" {:x "y" :z "n"})]
       (is (= (slurp (:body req))
