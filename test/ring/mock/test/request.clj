@@ -36,7 +36,7 @@
   (testing "nil path"
     (is (= (:uri (request :get "http://example.com")) "/")))
   (testing "added params in :get"
-    (is (= (:query-string (request :get "/" {:x "y" :z "n"}))
+    (is (= (:query-string (request :get "/" (array-map :x "y" :z "n")))
            "x=y&z=n"))
     (is (= (:query-string (request :get "/?a=b" {:x "y"}))
            "a=b&x=y"))
@@ -45,7 +45,7 @@
     (is (= (:query-string (request :get "/" {:x "a b"}))
            "x=a+b")))
   (testing "added params in :post"
-    (let [req (request :post "/" {:x "y" :z "n"})]
+    (let [req (request :post "/" (array-map :x "y" :z "n"))]
       (is (= (slurp (:body req))
              "x=y&z=n"))
       (is (nil? (:query-string req))))
@@ -68,7 +68,7 @@
       (is (= (:query-string req)
              "a=b"))))
   (testing "added params in :put"
-    (let [req (request :put "/" {:x "y" :z "n"})]
+    (let [req (request :put "/" (array-map :x "y" :z "n"))]
       (is (= (slurp (:body req)) "x=y&z=n")))))
 
 (deftest test-header
@@ -112,7 +112,7 @@
       (is (= (slurp (:body resp)) "Hello World"))
       (is (= (:content-length resp) 11))))
   (testing "map body"
-    (let [resp (body {} {:foo "bar" :fi ["fi" "fo" "fum"]})]
+    (let [resp (body {} (array-map :foo "bar" :fi ["fi" "fo" "fum"]))]
       (is (instance? InputStream (:body resp)))
       (is (= (slurp (:body resp)) "foo=bar&fi=fi&fi=fo&fi=fum"))
       (is (= (:content-length resp) 26))
