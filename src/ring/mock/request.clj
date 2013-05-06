@@ -1,6 +1,7 @@
 (ns ring.mock.request
   "Functions to create mock request maps."
-  (:require [clojure.string :as string])
+  (:require [clojure.string :as string]
+            [ring.util.codec :as codec])
   (:import java.util.Map
            java.io.ByteArrayInputStream
            [java.net URI URLEncoder]))
@@ -8,10 +9,7 @@
 (defn- encode-params
   "Turn a map of parameters into a urlencoded string."
   [params]
-  (string/join "&"
-    (for [[k v] params]
-      (str (URLEncoder/encode (name k)) "="
-           (URLEncoder/encode (str v))))))
+  (codec/form-encode params))
 
 (defn header
   "Add a HTTP header to the request map."
