@@ -112,10 +112,10 @@
       (is (= (slurp (:body resp)) "Hello World"))
       (is (= (:content-length resp) 11))))
   (testing "map body"
-    (let [resp (body {} {:foo "bar"})]
+    (let [resp (body {} {:foo "bar" :fi ["fi" "fo" "fum"]})]
       (is (instance? InputStream (:body resp)))
-      (is (= (slurp (:body resp)) "foo=bar"))
-      (is (= (:content-length resp) 7))
+      (is (= (slurp (:body resp)) "foo=bar&fi=fi&fi=fo&fi=fum"))
+      (is (= (:content-length resp) 26))
       (is (= (:content-type resp)
              "application/x-www-form-urlencoded"))))
   (testing "bytes body"
