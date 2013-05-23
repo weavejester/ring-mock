@@ -9,7 +9,7 @@ purposes.
 
 Add the following development dependency to your `project.clj` file:
 
-    [ring-mock "0.1.4"]
+    [ring-mock "0.1.5"]
 
 ## Documentation
 
