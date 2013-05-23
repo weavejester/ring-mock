@@ -35,6 +35,9 @@
       (is (= (slurp body) "quux=zot"))))
   (testing "nil path"
     (is (= (:uri (request :get "http://example.com")) "/")))
+  (testing "only params in :get"
+    (is (= (:query-string (request :get "/?a=b"))
+           "a=b")))
   (testing "added params in :get"
     (is (= (:query-string (request :get "/" (array-map :x "y" :z "n")))
            "x=y&z=n"))
