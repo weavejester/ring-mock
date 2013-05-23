@@ -9,7 +9,8 @@
 (defn- encode-params
   "Turn a map of parameters into a urlencoded string."
   [params]
-  (codec/form-encode params))
+  (if params
+    (codec/form-encode params)))
 
 (defn header
   "Add a HTTP header to the request map."
