@@ -29,3 +29,9 @@ Add the following development dependency to your `project.clj` file:
           :headers {"content-type" "text/plain"}
           :body "Your expected result"})))
 ```
+
+## License
+
+Copyright © 2014 James Reeves
+
+Distributed under the MIT License.

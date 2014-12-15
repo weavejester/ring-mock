@@ -1,5 +1,7 @@
 (defproject ring-mock "0.1.5"
   :description "A library for creating mock Ring request maps"
+  :license {:name "The MIT License"
+            :url "http://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.2.1"]
                  [ring/ring-codec "1.0.0"]]
   :plugins [[codox "0.6.4"]]
