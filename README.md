@@ -1,37 +1,5 @@
-# Ring-Mock
+## Ring-Mock has moved to: <https://github.com/ring-clojure/ring-mock>
 
-Ring-Mock is a library for creating [Ring][1] request maps for testing
-purposes.
-
-[1]: https://github.com/mmcgrana/ring
-
-## Installation
-
-Add the following development dependency to your `project.clj` file:
-
-    [ring-mock "0.1.5"]
-
-## Documentation
-
-* [API Documentation](http://weavejester.github.com/ring-mock)
-
-## Example
-
-```clojure
-(ns your-app.test.core
-  (:use your-app.core
-        clojure.test
-        ring.mock.request))
-
-(deftest your-handler-test
-  (is (= (your-handler (request :get "/doc/10"))
-         {:status 200
-          :headers {"content-type" "text/plain"}
-          :body "Your expected result"})))
-```
-
-## License
-
-Copyright © 2014 James Reeves
-
-Distributed under the MIT License.
+Ring-Mock has been moved to the Ring GitHub organization. This
+repository will no longer be updated, so please update your bookmarks
+and GitHub watches.
